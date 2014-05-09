@@ -16,6 +16,10 @@ use Params::Validate 0.76
 use POSIX qw(floor);
 use Try::Tiny;
 
+use Moo;
+use MooX::Types::MooseLike::Basic ':all';
+use DateTime::Types ':all';
+
 {
     my $loaded = 0;
 
@@ -110,53 +114,16 @@ BEGIN {
 }
 __PACKAGE__->DefaultLocale('en_US');
 
+
+has year   => (is => 'lazy', isa => Int); # XXX builder, required?
+has month  => (is => 'lazy', isa => Month,  builder => sub { 1 });
+has day    => (is => 'lazy', isa => Day,    builder => sub { 1 });
+has hour   => (is => 'lazy', isa => Hour,   builder => sub { 0 });
+has minute => (is => 'lazy', isa => Minute, builder => sub { 0 });
+has second => (is => 'lazy', isa => Second, builder => sub { 0 });
+
+
 my $BasicValidate = {
-    year => {
-        type      => SCALAR,
-        callbacks => {
-            'is an integer' => sub { $_[0] =~ /^-?\d+$/ }
-        },
-    },
-    month => {
-        type      => SCALAR,
-        default   => 1,
-        callbacks => {
-            'an integer between 1 and 12' =>
-                sub { $_[0] =~ /^\d+$/ && $_[0] >= 1 && $_[0] <= 12 }
-        },
-    },
-    day => {
-        type      => SCALAR,
-        default   => 1,
-        callbacks => {
-            'an integer which is a possible valid day of month' =>
-                sub { $_[0] =~ /^\d+$/ && $_[0] >= 1 && $_[0] <= 31 }
-        },
-    },
-    hour => {
-        type      => SCALAR,
-        default   => 0,
-        callbacks => {
-            'an integer between 0 and 23' =>
-                sub { $_[0] =~ /^\d+$/ && $_[0] >= 0 && $_[0] <= 23 },
-        },
-    },
-    minute => {
-        type      => SCALAR,
-        default   => 0,
-        callbacks => {
-            'an integer between 0 and 59' =>
-                sub { $_[0] =~ /^\d+$/ && $_[0] >= 0 && $_[0] <= 59 },
-        },
-    },
-    second => {
-        type      => SCALAR,
-        default   => 0,
-        callbacks => {
-            'an integer between 0 and 61' =>
-                sub { $_[0] =~ /^\d+$/ && $_[0] >= 0 && $_[0] <= 61 },
-        },
-    },
     nanosecond => {
         type      => SCALAR,
         default   => 0,
